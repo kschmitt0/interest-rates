@@ -33,7 +33,7 @@ newfinal_monthly_all <- read_excel(here("Data", "newfinal_monthly_all.xlsx"),
 ### Define variables
 
 ```{r}
-# Define variables
+#| label: Define variables
 CapRate <- ts(newfinal_monthly_all$cap, start = c(2013, 4), end = c(2024, 3), frequency = 12)
 DGS10 <- ts(newfinal_monthly_all$DGS10, start = c(2013, 4), end = c(2024, 3), frequency = 12)
 DFF <- ts(newfinal_monthly_all$DFF, start = c(2013, 4), end = c(2024, 3), frequency = 12)
