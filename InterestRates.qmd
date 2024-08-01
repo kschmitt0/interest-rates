@@ -34,10 +34,13 @@ newfinal_monthly_all <- read_excel(here("Data", "newfinal_monthly_all.xlsx"),
 
 ```{r}
 # Create function: create_ts
-create_ts <- function(data, column, start_year = 2013, start_month = 4, end_year = 2024, end_month = 3, frequency = 12) {
-  ts(data[[column]], start = c(start_year, start_month), end = c(end_year, end_month), frequency = frequency)
+create_ts <- function(data, column, time_period, frequency = 12) {
+  start <- time_period$start
+  end <- time_period$end
+  ts(data[[column]], start = start, end = end, frequency = frequency)
 }
 ```
+
 
 ```{r}
 # Create time period lists
