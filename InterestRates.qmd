@@ -8,6 +8,8 @@ editor: visual
 
 ## Setup
 
+### Load packages
+
 ```{r}
 library(vars)  
 library(mFilter)  
@@ -15,14 +17,22 @@ library(tseries)
 library(TSstudio)  
 library(forecast)
 library(tidyverse)
+library(here)
+library(readxl)
 ```
+
+### Import data
 
 ```{r}
 # Import data
-library(readxl)
-newfinal_monthly_all <- read_excel("C:/Users/kschmitt1/Knipp Wolf NLG Dropbox/Knipp Group Team Folder/5 - STAFF/3 - STAFF/KSchmitt/Research Reports/Interest Rates (General Report 1)/newfinal_monthly_all.xlsx", 
+newfinal_monthly_all <- read_excel(here("Data", "newfinal_monthly_all.xlsx"), 
     col_types = c("date", "numeric", "numeric", 
         "numeric", "numeric", "numeric"))
+```
+
+### Define variables
+
+```{r}
 # Define variables
 CapRate <- ts(newfinal_monthly_all$cap, start = c(2013, 4), end = c(2024, 3), frequency = 12)
 DGS10 <- ts(newfinal_monthly_all$DGS10, start = c(2013, 4), end = c(2024, 3), frequency = 12)
