@@ -63,6 +63,14 @@ lnDFF <- create_ts(newfinal_monthly_all, "lnDFF", time_period_full)
 #| label: Create difference variables
 DGS10_d2 <- diff(DGS10, differences = 2)
 DFF_d2 <- diff(DFF, differences = 2)
+
+# Pad with NA to match original length
+DGS10_d2_padded <- c(rep(NA, 2), DGS10_d2)
+DFF_d2_padded <- c(rep(NA, 2), DFF_d2)
+
+# Add padded variables to original df
+newfinal_monthly_all$DGS10_d2 <- DGS10_d2_padded
+newfinal_monthly_all$DFF_d2 <- DFF_d2_padded
 ```
 
 ```{r}
