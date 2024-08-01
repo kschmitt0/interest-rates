@@ -30,7 +30,7 @@ newfinal_monthly_all <- read_excel(here("Data", "newfinal_monthly_all.xlsx"),
         "numeric", "numeric", "numeric"))
 ```
 
-### Define variables
+### Create functions and lists
 
 ```{r}
 #| label: Create function: create_ts
@@ -43,30 +43,32 @@ create_ts <- function(data, column, time_period, frequency = 12) {
 
 ```{r}
 #| label: Create time period lists
-time_period1 <- list(start = c(2013, 4), end = c(2024, 3))
-
+time_period_full <- list(start = c(2013, 4), end = c(2024, 3))
+time_period_old <- list(start = c(2013,4), end = c(2023,3))
+time_period_actual <- list(start = c(2023, 4), end = c(2024, 3))
 ```
 
-\
+### Define variables
 
 ```{r}
 #| label: Define variables
-CapRate <- ts(newfinal_monthly_all$cap, start = c(2013, 4), end = c(2024, 3), frequency = 12)
-DGS10 <- ts(newfinal_monthly_all$DGS10, start = c(2013, 4), end = c(2024, 3), frequency = 12)
-DFF <- ts(newfinal_monthly_all$DFF, start = c(2013, 4), end = c(2024, 3), frequency = 12)
-lnDGS10 <- ts(newfinal_monthly_all$lnDGS10, start = c(2013, 4), end = c(2024, 3), frequency = 12)
-lnDFF <- ts(newfinal_monthly_all$lnDFF, start = c(2013, 4), end = c(2024, 3), frequency = 12)
-newfinal_monthly_all$observation_date <- as.Date(newfinal_monthly_all$observation_date)
-# Create difference variables
-DGS10_d2 <- diff(DGS10, differences = 2)
-DFF_d2 <- diff(DFF, differences = 2)
-# Define new variables
-DGS10_d2 <- ts(DGS10_d2, start = c(2013, 4), end = c(2024, 3), frequency = 12)
-DFF_d2 <- ts(DFF_d2, start = c(2013, 4), end = c(2024, 3), frequency = 12)
+CapRate <- create_ts(newfinal_monthly_all, "cap", time_period_full)
+DGS10 <- create_ts(newfinal_monthly_all, "DGS10", time_period_full)
+DFF <- create_ts(newfinal_monthly_all, "DFF", time_period_full)
+lnDGS10 <- create_ts(newfinal_monthly_all, "lnDGS10", time_period_full)
+lnDFF <- create_ts(newfinal_monthly_all, "lnDFF", time_period_full)
 ```
 
-```         
-should this set have the "n" prefix for new, or should this have no prefix and I make "new" later?
+```{r}
+#| label: Create difference variables
+DGS10_d2 <- diff(DGS10, differences = 2)
+DFF_d2 <- diff(DFF, differences = 2)
+```
+
+```{r}
+#| label: Define new differenced variables
+DGS10_d2 <- create_ts(newfinal_monthly_all, "DGS10_d2", time_period_full)
+DFF_d2 <- create_ts(newfinal_monthly_all, "DFF_d2", time_period_full)
 ```
 
 ## Subset data
