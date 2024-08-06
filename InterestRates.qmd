@@ -41,7 +41,6 @@ create_ts <- function(data, column, time_period, frequency = 12) {
 }
 ```
 
-
 ```{r}
 # Create time period lists
 time_period_full <- list(start = c(2013, 4), end = c(2024, 3))
