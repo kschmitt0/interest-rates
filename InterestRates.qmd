@@ -63,13 +63,18 @@ lnDFF <- create_ts(newfinal_monthly_all, "lnDFF", time_period_full)
 # Create difference variables
 DGS10_d2 <- diff(DGS10, differences = 2)
 DFF_d2 <- diff(DFF, differences = 2)
-
 ```
 
 ```{r}
 # Define new differenced variables
 DGS10_d2 <- ts(DGS10_d2, start = c(2013, 4), end = c(2024, 3), frequency = 12)
 DFF_d2 <- ts(DFF_d2, start = c(2013, 4), end = c(2024, 3), frequency = 12)
+```
+
+```{r}
+# Add new differenced variables to dataframe
+newfinal_monthly_all$DGS10_d2 <- DGS10_d2
+newfinal_monthly_all$DFF_d2 <- DFF_d2
 ```
 
 ## Subset data
