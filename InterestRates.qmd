@@ -64,19 +64,12 @@ lnDFF <- create_ts(newfinal_monthly_all, "lnDFF", time_period_full)
 DGS10_d2 <- diff(DGS10, differences = 2)
 DFF_d2 <- diff(DFF, differences = 2)
 
-# Pad with NA to match original length
-DGS10_d2_padded <- c(rep(NA, 2), DGS10_d2)
-DFF_d2_padded <- c(rep(NA, 2), DFF_d2)
-
-# Add padded variables to original df
-newfinal_monthly_all$DGS10_d2 <- DGS10_d2_padded
-newfinal_monthly_all$DFF_d2 <- DFF_d2_padded
 ```
 
 ```{r}
 # Define new differenced variables
-DGS10_d2 <- create_ts(newfinal_monthly_all, "DGS10_d2", time_period_full)
-DFF_d2 <- create_ts(newfinal_monthly_all, "DFF_d2", time_period_full)
+DGS10_d2 <- ts(DGS10_d2, start = c(2013, 4), end = c(2024, 3), frequency = 12)
+DFF_d2 <- ts(DFF_d2, start = c(2013, 4), end = c(2024, 3), frequency = 12)
 ```
 
 ## Subset data
