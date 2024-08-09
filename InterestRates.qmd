@@ -138,13 +138,17 @@ actualDFF_d2 <- ts(actualDFF_d2, start = c(2023, 4), end = c(2024, 3), frequency
 # Make new dataframe with only model variables
 olddf <- cbind(oldCapRate, oldDGS10_d2, oldDFF_d2)
 colnames(olddf) <- cbind("CapRate", "DGS10", "DFF")
-# Create model
-oldModel <- VAR(olddf, p = 4, type = "const", season = NULL, exog = NULL)
 ```
 
-```         
-replaced "v1" with "olddf"
-replaced "Model1" with "oldModel"
+```{r}
+# Determine lag order
+lagselect <- VARselect(olddf, lag.max = 15, type = "const")
+lagselect$selection
+```
+
+```{r}
+# Create model
+oldModel <- VAR(olddf, p = 4, type = "const", season = NULL, exog = NULL)
 ```
 
 ## Forecast (old)
@@ -215,12 +219,17 @@ error$DFFmape=mean(abs((actualdata$DFF-oldforecast$DFFfcst)/oldforecast$DFFfcst)
 # Make new dataframe with only model variables
 newdf <- cbind(CapRate, DGS10_d2, DFF_d2)
 colnames(newdf) <- cbind("CapRate", "DGS10", "DFF")
-# Create model
-newModel <- VAR(newdf, p = 4, type = "const", season = NULL, exog = NULL)
 ```
 
-```         
-is p = 4 correct to use here? I need to do my model fitting (and testing) steps for this
+```{r}
+# Determine lag order
+lagselect <- VARselect(newdf, lag.max = 15, type = "const")
+lagselect$selection
+```
+
+```{r}
+# Create model
+newModel <- VAR(newdf, p = 4, type = "const", season = NULL, exog = NULL)
 ```
 
 ## Forecast (new)
