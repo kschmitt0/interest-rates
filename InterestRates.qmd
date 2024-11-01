@@ -232,20 +232,6 @@ lagselect$selection
 newModel <- VAR(newdf, p = 4, type = "const", season = NULL, exog = NULL)
 ```
 
-## Forecast (new)
-
-```{r}
-newforecast <- predict(newModel, n.ahead = 12, ci = 0.95)
-```
-
-### Extract forecast values (new)
-
-```{r}
-# Import csv of forecast values
-newforecast <- read_excel("C:/Users/kschmitt1/Knipp Wolf NLG Dropbox/Knipp Group Team Folder/5 - STAFF/3 - STAFF/KSchmitt/Research Reports/Interest Rates (General Report 1)/newforecast.xlsx")
-newforecast$observation_date <- as.Date(oldforecast$observation_date)
-```
-
 ## Model Diagnostics
 
 ### Autocorrelation
@@ -355,6 +341,18 @@ plot(FEVD1)
 ```
 
 ## Forecasting
+
+```{r}
+forecast <- predict(newModel, n.ahead = 12, ci = 0.95)
+```
+
+### Extract forecast values (new)
+
+```{r}
+# Import csv of forecast values 
+forecast <- read_excel("C:/Users/kschmitt1/Knipp Wolf NLG Dropbox/Knipp Group Team Folder/5 - STAFF/3 - STAFF/KSchmitt/Research Reports/Interest Rates (General Report 1)/newforecast.xlsx") 
+forecast$observation_date <- as.Date(oldforecast$observation_date)
+```
 
 ### Fan chart
 
