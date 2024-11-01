@@ -67,8 +67,8 @@ DFF_d2 <- diff(DFF, differences = 2)
 
 ```{r}
 # Define new differenced variables
-DGS10_d2 <- ts(DGS10_d2, start = c(2013, 4), end = c(2024, 3), frequency = 12)
-DFF_d2 <- ts(DFF_d2, start = c(2013, 4), end = c(2024, 3), frequency = 12)
+DGS10_d2 <- ts(DGS10_d2, start = c(2013, 4), end = c(2024, 8), frequency = 12)
+DFF_d2 <- ts(DFF_d2, start = c(2013, 4), end = c(2024, 8), frequency = 12)
 ```
 
 ```{r}
