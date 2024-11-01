@@ -368,4 +368,5 @@ forecast
     -   did I mess something up? or is this fine? again, I don't think this model is supposed to predict those variables
 -   need to figure out Autocorrelation, see notes there
 -   need to review all Model Diagnostics, evaluate and interpret
+-   I'd like to make forecast plots shorter, more square, so the forecast is more visible
 -   update test branch-1
