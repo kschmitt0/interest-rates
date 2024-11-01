@@ -3,7 +3,8 @@
 .RData
 .Ruserdata
 Data/
-InterestRates.Rproj
 libs/
 figure-html/
 InterestRates_files/
+/InterestRates.Rproj
+/InterestRates.html
