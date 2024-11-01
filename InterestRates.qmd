@@ -350,8 +350,6 @@ plot(forecast)
 ### Fan chart
 
 ```{r}
-forecast <- predict(newModel, n.ahead = 12, ci = 0.95)
-
 fanchart(forecast, names = "CapRate", main = "Fanchart for CapRate", xlab = "Horizon", ylab = "CapRate")
 
 fanchart(forecast, names = "DGS10", main = "Fanchart for DGS10", xlab = "Horizon", ylab = "DGS10")
