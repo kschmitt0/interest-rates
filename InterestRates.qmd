@@ -367,4 +367,5 @@ forecast
         -   my model is really just to predict cap rates, not these variables, but it does kind of do that and the predictions of those impact the cap rate predictions.
     -   did I mess something up? or is this fine? again, I don't think this model is supposed to predict those variables
 -   need to figure out Autocorrelation, see notes there
+-   need to review all Model Diagnostics, evaluate and interpret
 -   update test branch-1
