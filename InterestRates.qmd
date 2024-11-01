@@ -296,7 +296,79 @@ plot(Stability1)
 
 -   Tests for structural breaks
     -   Important test - if structural breaks are present, all estimates will be off
-    -   Structural breaks indicated by black line going outside red critical
+    -   Structural breaks indicated by black line going outside red critical bounds
+
+## Policy simulations
+
+### Granger Causality
+
+```{r}
+GrangerCapRate <- causality(newModel, cause = "CapRate")
+GrangerCapRate
+
+GrangerDGS10 <- causality(newModel, cause = "DGS10")
+GrangerDGS10
+
+GrangerDFF <- causality(newModel, cause = "DFF")
+GrangerDFF
+```
+
+-   Tests for any causality relationships between variables: unidirectional, bidirectional, or none
+
+### Impulse Response Functions
+
+```{r}
+CapRateirf <- irf(newModel, impulse = "CapRate", response = "CapRate", n.ahead = 12, boot = TRUE)
+plot(CapRateirf, ylab = "CapRate", main = "CapRate's shock to CapRate")
+
+CapRateirf2 <- irf(newModel, impulse = "CapRate", response = "DGS10", n.ahead = 12, boot = TRUE)
+plot(CapRateirf2, ylab = "DGS10", main = "CapRate's shock to DGS10")
+
+CapRateirf3 <- irf(newModel, impulse = "CapRate", response = "DFF", n.ahead = 12, boot = TRUE)
+plot(CapRateirf3, ylab = "DFF", main = "CapRate's shock to DFF")
+
+DGS10irf <- irf(newModel, impulse = "DGS10", response = "DGS10", n.ahead = 12, boot = TRUE)
+plot(DGS10irf, ylab = "DGS10", main = "DGS10's shock to DGS10")
+
+DGS10irf2 <- irf(newModel, impulse = "DGS10", response = "CapRate", n.ahead = 12, boot = TRUE)
+plot(DGS10irf2, ylab = "CapRate", main = "DGS10's shock to CapRate")
+
+DGS10irf3 <- irf(newModel, impulse = "DGS10", response = "DFF", n.ahead = 12, boot = TRUE)
+plot(DGS10irf3, ylab = "DFF", main = "DGS10's shock to DFF")
+
+DFFirf <- irf(newModel, impulse = "DFF", response = "DFF", n.ahead = 12, boot = TRUE)
+plot(DFFirf, ylab = "DFF", main = "DFF's shock to DFF")
+
+DFFirf2 <- irf(newModel, impulse = "DFF", response = "DGS10", n.ahead = 12, boot = TRUE)
+plot(DFFirf2, ylab = "DGS10", main = "DFF's shock to DGS10")
+
+DFFirf3 <- irf(newModel, impulse = "DFF", response = "CapRate", n.ahead = 12, boot = TRUE)
+plot(DGS10irf3, ylab = "CapRate", main = "DFF's shock to CapRate")
+```
+
+### Forecast Error Variance Decomposition
+
+```{r}
+FEVD1 <- fevd(newModel, n.ahead = 12)
+FEVD1
+plot(FEVD1)
+```
+
+## Forecasting
+
+### Fan chart
+
+```{r}
+forecast <- predict(newModel, n.ahead = 12, ci = 0.95)
+
+fanchart(forecast, names = "CapRate", main = "Fanchart for CapRate", xlab = "Horizon", ylab = "CapRate")
+
+fanchart(forecast, names = "DGS10", main = "Fanchart for DGS10", xlab = "Horizon", ylab = "DGS10")
+
+fanchart(forecast, names = "DFF", main = "Fanchart for DFF", xlab = "Horizon", ylab = "DFF")
+
+forecast
+```
 
 # CURRENT PROBLEMS
 
