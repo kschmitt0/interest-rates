@@ -252,7 +252,5 @@ newforecast$observation_date <- as.Date(oldforecast$observation_date)
 -   error on DGS10 and DFF are horrible.
     -   what are the theoretical reasons for this, if any?
         -   my model is really just to predict cap rates, not these variables, but it does kind of do that and the predictions of those impact the cap rate predictions.
-    -   did I mess something up?
-    -   should I include CI in forecast dfs?
--   I seemed to think before that I couldn't do mape on individual variables, that it was for the whole model, but this was while I was just doing it for CapRate.
+    -   did I mess something up? or is this fine? again, I don't think this model is supposed to predict those variables
 -   update test branch-1
