@@ -255,4 +255,3 @@ newforecast$observation_date <- as.Date(oldforecast$observation_date)
     -   did I mess something up?
     -   should I include CI in forecast dfs?
 -   I seemed to think before that I couldn't do mape on individual variables, that it was for the whole model, but this was while I was just doing it for CapRate.
--   UPDATE TEST
