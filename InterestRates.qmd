@@ -287,6 +287,17 @@ Norm1 <- normality.test(newModel, multivariate.only = TRUE)
 Norm1
 ```
 
+### Stability
+
+```{r}
+Stability1 <- stability(newModel, type = "OLS-CUSUM")
+plot(Stability1)
+```
+
+-   Tests for structural breaks
+    -   Important test - if structural breaks are present, all estimates will be off
+    -   Structural breaks indicated by black line going outside red critical
+
 # CURRENT PROBLEMS
 
 -   I need to make sure that the model fitting and testing steps are correct for the new data
