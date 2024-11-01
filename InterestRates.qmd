@@ -280,6 +280,13 @@ Arch1
 
 -   Results may change with lag order
 
+### Normality
+
+```{r}
+Norm1 <- normality.test(newModel, multivariate.only = TRUE)
+Norm1
+```
+
 # CURRENT PROBLEMS
 
 -   I need to make sure that the model fitting and testing steps are correct for the new data
