@@ -344,14 +344,7 @@ plot(FEVD1)
 
 ```{r}
 forecast <- predict(newModel, n.ahead = 12, ci = 0.95)
-```
-
-### Extract forecast values (new)
-
-```{r}
-# Import csv of forecast values 
-forecast <- read_excel("C:/Users/kschmitt1/Knipp Wolf NLG Dropbox/Knipp Group Team Folder/5 - STAFF/3 - STAFF/KSchmitt/Research Reports/Interest Rates (General Report 1)/newforecast.xlsx") 
-forecast$observation_date <- as.Date(oldforecast$observation_date)
+plot(forecast)
 ```
 
 ### Fan chart
