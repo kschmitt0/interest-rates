@@ -246,6 +246,21 @@ newforecast <- read_excel("C:/Users/kschmitt1/Knipp Wolf NLG Dropbox/Knipp Group
 newforecast$observation_date <- as.Date(oldforecast$observation_date)
 ```
 
+## Model Diagnostics
+
+### Autocorrelation
+
+```{r}
+serial <- serial.test(newModel, lags.pt = 5, type = "PT.asymptotic")
+serial
+```
+
+-   Residuals should ideally be non-autocorrelated
+    -   Assumption: residuals are white noise uncorrelated with previous periods
+    -   Results can change with lag order, so it is best to experiment with different lag order values
+    -   *K: I'm not sure how they chose the lag order value as 5 here since it was 2 in the last step*
+    -   *K: I'm also not sure how to read residuals for signs of autocorrelation*
+
 # CURRENT PROBLEMS
 
 -   I need to make sure that the model fitting and testing steps are correct for the new data
@@ -253,4 +268,5 @@ newforecast$observation_date <- as.Date(oldforecast$observation_date)
     -   what are the theoretical reasons for this, if any?
         -   my model is really just to predict cap rates, not these variables, but it does kind of do that and the predictions of those impact the cap rate predictions.
     -   did I mess something up? or is this fine? again, I don't think this model is supposed to predict those variables
+-   need to figure out Autocorrelation, see notes there
 -   update test branch-1
