@@ -261,6 +261,25 @@ serial
     -   *K: I'm not sure how they chose the lag order value as 5 here since it was 2 in the last step*
     -   *K: I'm also not sure how to read residuals for signs of autocorrelation*
 
+### Heteroscedasticity
+
+```{r}
+Arch1 <- arch.test(newModel, lags.multi = 15, multivariate.only = TRUE)
+Arch1
+```
+
+-   ARCH effects: clustered volatility areas in a time series
+
+    -   Volatility in these areas can change the variance of residuals, violating the assumption of constant variance. Constant volatility models can account for this
+
+        -   If null is not rejected by this test:
+
+            -   No ARCH effects in model
+
+            -   No heteroscedasticity
+
+-   Results may change with lag order
+
 # CURRENT PROBLEMS
 
 -   I need to make sure that the model fitting and testing steps are correct for the new data
