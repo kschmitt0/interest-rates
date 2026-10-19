@@ -1,0 +1,243 @@
+---
+title: "Interest Rates and Cap Rate Forecasting"
+format: html
+editor: visual
+---
+
+# Interest Rates Model
+
+This document replicates an earlier vector autoregression (VAR) forecast of commercial real estate cap rates that uses the 10-year Treasury yield (DGS10) and the federal funds rate (DFF) as predictors. It tests how well that forecast held up from April 2023 to March 2024, then re-estimates the model on the full sample and forecasts 12 months ahead.
+
+The model exists to forecast **cap rates**. The interest rate forecasts are inputs to the model, so their accuracy is reported but is not the goal.
+
+## Setup
+
+### Load packages
+
+```{r}
+#| message: false
+library(vars)
+library(tseries)
+library(tidyverse)
+library(here)
+library(readxl)
+```
+
+### Settings
+
+```{r}
+data_path <- here("Data", "newfinal_monthly_all.xlsx")
+if (!file.exists(data_path)) {
+  stop("Data file not found: ", data_path,
+       "\nPlace newfinal_monthly_all.xlsx in a Data/ folder at the project root.")
+}
+
+diff_order <- 2   # order of differencing applied to DGS10 and DFF
+p_lag      <- 4   # VAR lag order (compare with the VARselect output below)
+n_ahead    <- 12  # forecast horizon in months
+```
+
+### Import data
+
+Expected columns: `observation_date`, `cap` (cap rate), `DGS10`, `DFF`. Monthly, April 2013 to March 2024.
+
+```{r}
+dat <- read_excel(data_path) |>
+  transmute(
+    observation_date = as.Date(observation_date),
+    CapRate = cap,
+    DGS10   = DGS10,
+    DFF     = DFF
+  ) |>
+  arrange(observation_date)
+
+expected_months <- seq(as.Date("2013-04-01"), as.Date("2024-03-01"), by = "month")
+stopifnot(
+  !anyNA(dat),
+  nrow(dat) == length(expected_months),
+  all(format(dat$observation_date, "%Y-%m") == format(expected_months, "%Y-%m"))
+)
+
+levels_ts <- ts(as.matrix(dat[, c("CapRate", "DGS10", "DFF")]),
+                start = c(2013, 4), frequency = 12)
+```
+
+## Prepare model data
+
+DGS10 and DFF are differenced to make them stationary.
+
+```{r}
+model_ts <- ts.intersect(
+  CapRate = levels_ts[, "CapRate"],
+  DGS10   = diff(levels_ts[, "DGS10"], differences = diff_order),
+  DFF     = diff(levels_ts[, "DFF"],   differences = diff_order)
+)
+```
+
+Stationarity check (augmented Dickey-Fuller; small p-values support stationarity):
+
+```{r}
+round(sapply(colnames(model_ts), function(v) adf.test(model_ts[, v])$p.value), 3)
+```
+
+### Split into training and test periods
+
+```{r}
+train_end  <- c(2023, 3)
+test_start <- c(2023, 4)
+
+old_model_ts <- window(model_ts,  end   = train_end)    # model inputs, through Mar 2023
+old_levels   <- window(levels_ts, end   = train_end)    # levels, used to rebuild forecasts
+actual       <- window(levels_ts, start = test_start)   # actual levels, Apr 2023 to Mar 2024
+
+actual_df <- bind_cols(
+  tibble(observation_date = seq(as.Date("2023-04-01"), by = "month", length.out = n_ahead)),
+  as_tibble(as.data.frame(actual))
+)
+```
+
+## Helper functions
+
+```{r}
+# Rebuild levels from forecasted differences using the last observed levels
+undiff <- function(fc_diff, last_levels, d = diff_order) {
+  diffinv(fc_diff, differences = d, xi = tail(last_levels, d))[-seq_len(d)]
+}
+
+# Turn a vars::predict() result into a tidy data frame of forecast levels
+forecast_to_levels <- function(fc, history_levels, start_date) {
+  tibble(
+    observation_date = seq(start_date, by = "month", length.out = n_ahead),
+    CapRate_fcst  = fc$fcst$CapRate[, "fcst"],
+    CapRate_lower = fc$fcst$CapRate[, "lower"],
+    CapRate_upper = fc$fcst$CapRate[, "upper"],
+    DGS10_fcst    = undiff(fc$fcst$DGS10[, "fcst"], history_levels[, "DGS10"]),
+    DFF_fcst      = undiff(fc$fcst$DFF[, "fcst"],   history_levels[, "DFF"])
+  )
+}
+```
+
+## Build model (old)
+
+```{r}
+lag_old <- VARselect(old_model_ts, lag.max = 15, type = "const")
+lag_old$selection
+```
+
+```{r}
+old_model <- VAR(old_model_ts, p = p_lag, type = "const")
+```
+
+## Forecast (old)
+
+```{r}
+old_fc <- predict(old_model, n.ahead = n_ahead, ci = 0.95)
+fc_old <- forecast_to_levels(old_fc, old_levels, as.Date("2023-04-01"))
+fc_old
+```
+
+## Compare old forecast to actual values
+
+### Line graphs
+
+```{r}
+plot_forecast <- function(var, ribbon = FALSE) {
+  p <- ggplot()
+  if (ribbon) {
+    p <- p + geom_ribbon(
+      data = fc_old,
+      aes(x = observation_date, ymin = .data[[paste0(var, "_lower")]],
+          ymax = .data[[paste0(var, "_upper")]]),
+      fill = "blue", alpha = 0.12
+    )
+  }
+  p +
+    geom_line(data = fc_old,
+              aes(x = observation_date, y = .data[[paste0(var, "_fcst")]], color = "Forecast")) +
+    geom_line(data = actual_df,
+              aes(x = observation_date, y = .data[[var]], color = "Actual")) +
+    scale_color_manual(values = c(Forecast = "blue", Actual = "red")) +
+    labs(title = paste(var, "forecast vs. actual"), x = NULL, y = var, color = NULL)
+}
+```
+
+```{r}
+plot_forecast("CapRate", ribbon = TRUE)
+```
+
+```{r}
+plot_forecast("DGS10")
+```
+
+```{r}
+plot_forecast("DFF")
+```
+
+### Forecast accuracy
+
+Absolute error by month, then summary measures for each variable. MAPE uses the actual value in the denominator.
+
+```{r}
+comparison <- inner_join(fc_old, actual_df, by = "observation_date")
+
+abs_errors <- tibble(
+  observation_date = comparison$observation_date,
+  CapRate = abs(comparison$CapRate - comparison$CapRate_fcst),
+  DGS10   = abs(comparison$DGS10   - comparison$DGS10_fcst),
+  DFF     = abs(comparison$DFF     - comparison$DFF_fcst)
+)
+abs_errors
+```
+
+```{r}
+accuracy <- map_dfr(c("CapRate", "DGS10", "DFF"), function(v) {
+  a <- comparison[[v]]
+  f <- comparison[[paste0(v, "_fcst")]]
+  tibble(
+    variable = v,
+    MAE      = mean(abs(a - f)),
+    MAPE_pct = 100 * mean(abs((a - f) / a))
+  )
+})
+accuracy
+```
+
+## Build model (new)
+
+Re-estimate on the full sample (April 2013 to March 2024).
+
+```{r}
+lag_new <- VARselect(model_ts, lag.max = 15, type = "const")
+lag_new$selection
+```
+
+```{r}
+new_model <- VAR(model_ts, p = p_lag, type = "const")
+```
+
+## Forecast (new)
+
+```{r}
+new_fc <- predict(new_model, n.ahead = n_ahead, ci = 0.95)
+fc_new <- forecast_to_levels(new_fc, levels_ts, as.Date("2024-04-01"))
+fc_new
+```
+
+```{r}
+history <- tibble(observation_date = dat$observation_date, CapRate = dat$CapRate)
+
+ggplot() +
+  geom_line(data = history, aes(x = observation_date, y = CapRate)) +
+  geom_ribbon(data = fc_new,
+              aes(x = observation_date, ymin = CapRate_lower, ymax = CapRate_upper),
+              fill = "blue", alpha = 0.12) +
+  geom_line(data = fc_new, aes(x = observation_date, y = CapRate_fcst), color = "blue") +
+  labs(title = "Cap rate: history and 12-month forecast", x = NULL, y = "Cap rate")
+```
+
+## Limitations
+
+-   The cap rate is modeled in levels while DGS10 and DFF are second-differenced. Test whether this mix is appropriate (for example with the ADF results above, or by trying first differences).
+-   Forecast intervals are shown for the cap rate only. Intervals for DGS10 and DFF are not shown because they are produced on the differenced scale.
+-   The lag order is set to `p_lag`. Compare it with the `VARselect` criteria above and document the choice.
+-   With one 12-month test window, MAE and MAPE are a small sample of forecast performance.
